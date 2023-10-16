@@ -1,0 +1,5 @@
+fastapi==0.68.1
+uvicorn==0.15.0
+aioredis==2.0.0
+python-memcached==1.59
+requests==2.26.0

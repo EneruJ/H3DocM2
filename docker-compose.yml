@@ -1,0 +1,31 @@
+version: '3'
+services:
+    core_api:
+        build: .
+        container_name: "core-api-container"
+        ports:
+            - "8000:15400"
+        volumes:
+            - ./app/:/app
+        depends_on:
+            - redis
+            - memcached
+        networks:
+            - mynetwork
+
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - mynetwork
+
+    memcached:
+        image: memcached
+        ports:
+            - "11211:11211"
+        networks:
+            - mynetwork
+
+networks:
+    mynetwork:
