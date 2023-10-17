@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException
 import aioredis
-import memcache 
+import memcache
 
 app = FastAPI()
 
 async def connect_to_redis():
-    redis = await aioredis.create_redis_pool("redis://localhost:6379")
+    redis = await aioredis.create_redis("redis://redis:6379")
     return redis
 
 @app.on_event("startup")
@@ -23,14 +23,16 @@ memcached = memcache.Client(["memcached:11211"])
 async def read_root():
     try:
         value = memcached.get("nb_click")
-        
+
         if value is None:
             value = await app.redis.get("nb_click") or 0
-            memcached.set("nb_click", value, time=3600)  
+            memcached.set("nb_click", value, time=3600)
+
+        incremented_value = int(value) + 1
+        memcached.set("nb_click", incremented_value, time=3600)
+        await app.redis.set("nb_click", incremented_value)
         
-        await app.redis.set("nb_click", int(value) + 1)
-        result = await app.redis.get("nb_click")
-        return {"Nombre d'entrées": int(result)}
+        return {"Nombre d'entrées": incremented_value}
     except Exception as e:
         raise HTTPException(status_code=500, detail="Erreur Redis")
 

@@ -9,7 +9,6 @@ services:
             - ./app/:/app
         depends_on:
             - redis
-            - memcached
         networks:
             - mynetwork
 
@@ -24,6 +23,17 @@ services:
         image: memcached
         ports:
             - "11211:11211"
+        networks:
+            - mynetwork
+
+    nginx:
+        image: nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf
+        depends_on:
+            - core_api
         networks:
             - mynetwork
 
